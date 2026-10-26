@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>یه چندتا سوال</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy-900: #060d22;
+    --navy-800: #0a1633;
+    --navy-700: #112150;
+    --navy-500: #24397a;
+    --blue-400: #5b9cff;
+    --blue-500: #2f6bff;
+    --ice: #e8f0ff;
+    --mist: #9fb3e0;
+    --ember: #ff9a9a;
+  }
+
+  * { box-sizing: border-box; margin: 0; }
+
+  html, body { height: 100%; }
+
+  body {
+    font-family: "Vazirmatn", "Vazir", Tahoma, system-ui, sans-serif;
+    color: var(--ice);
+    background:
+      radial-gradient(900px 520px at 50% -10%, rgba(47, 107, 255, 0.28), transparent 70%),
+      radial-gradient(700px 480px at 100% 110%, rgba(91, 156, 255, 0.14), transparent 70%),
+      var(--navy-900);
+    display: grid;
+    place-items: center;
+    padding: 24px 16px;
+    min-height: 100dvh;
+    overflow-x: hidden;
+  }
+
+  .card {
+    width: min(100%, 460px);
+    background: linear-gradient(180deg, var(--navy-700), var(--navy-800));
+    border: 1px solid var(--navy-500);
+    border-radius: 28px;
+    padding: 36px 28px 32px;
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  }
+
+  /* progress */
+  .progress {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 36px;
+  }
+  .progress i {
+    width: 28px;
+    height: 5px;
+    border-radius: 99px;
+    background: var(--navy-500);
+    transition: background 0.4s, width 0.4s;
+  }
+  .progress i.on { background: var(--blue-400); }
+  .progress i.now { width: 44px; }
+
+  .step { display: none; text-align: center; }
+  .step.show { display: block; animation: fade 0.5s ease both; }
+
+  @keyframes fade { from { opacity: 0; } to { opacity: 1; } }
+
+  h1 {
+    font-size: clamp(1.9rem, 7vw, 2.5rem);
+    font-weight: 800;
+    line-height: 1.5;
+    letter-spacing: -0.01em;
+    margin-bottom: 10px;
+  }
+
+  .hint {
+    color: var(--mist);
+    font-size: 0.95rem;
+    line-height: 1.9;
+    min-height: 1.9em;
+    margin-bottom: 28px;
+  }
+
+  .row {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 14px;
+    min-height: 56px;
+  }
+
+  button {
+    font-family: inherit;
+    font-size: 1.05rem;
+    font-weight: 600;
+    min-width: 116px;
+    height: 54px;
+    padding: 0 26px;
+    border-radius: 16px;
+    cursor: pointer;
+    transition: transform 0.15s ease, background 0.2s, border-color 0.2s;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .yes, .send {
+    background: var(--blue-500);
+    color: #fff;
+    border: 1px solid var(--blue-400);
+    box-shadow: 0 10px 28px rgba(47, 107, 255, 0.4);
+  }
+  .yes:hover, .send:hover { background: #4379ff; }
+  .yes:active, .send:active { transform: scale(0.97); }
+
+  .no {
+    background: transparent;
+    color: var(--mist);
+    border: 1px solid var(--navy-500);
+    touch-action: none;
+  }
+  .no.loose {
+    position: fixed;
+    z-index: 50;
+    margin: 0;
+    transition: left 0.28s cubic-bezier(.2, .9, .3, 1.2), top 0.28s cubic-bezier(.2, .9, .3, 1.2);
+  }
+
+  .slot { display: inline-block; }
+
+  /* text answer */
+  .field {
+    width: 100%;
+    height: 58px;
+    border-radius: 16px;
+    border: 1px solid var(--navy-500);
+    background: var(--navy-900);
+    color: var(--ice);
+    font-family: inherit;
+    font-size: 1.15rem;
+    text-align: center;
+    padding: 0 16px;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .field::placeholder { color: #5a6ea3; }
+  .field:focus {
+    border-color: var(--blue-400);
+    box-shadow: 0 0 0 4px rgba(91, 156, 255, 0.2);
+  }
+  .field.shake { animation: shake 0.45s ease; }
+
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    20% { transform: translateX(-10px); }
+    40% { transform: translateX(9px); }
+    60% { transform: translateX(-6px); }
+    80% { transform: translateX(4px); }
+  }
+
+  .stack { display: grid; gap: 14px; }
+
+  .error {
+    color: var(--ember);
+    font-weight: 600;
+    min-height: 1.9em;
+    font-size: 1.02rem;
+  }
+
+  /* finale */
+  .finale h1 { margin-bottom: 14px; }
+  .finale .hint { margin-bottom: 0; font-size: 1.05rem; }
+  .heart {
+    width: 74px;
+    height: 74px;
+    margin: 0 auto 22px;
+    display: block;
+    filter: drop-shadow(0 8px 24px rgba(47, 107, 255, 0.6));
+    animation: beat 1.6s ease-in-out infinite;
+  }
+  @keyframes beat {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+  }
+
+  button:focus-visible {
+    outline: 3px solid var(--blue-400);
+    outline-offset: 3px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .heart, .field.shake, .step.show { animation: none; }
+    .no.loose { transition: none; }
+  }
+
+  @media (max-width: 380px) {
+    .card { padding: 30px 20px 26px; }
+    button { min-width: 100px; padding: 0 20px; }
+  }
+</style>
+</head>
+<body>
+
+<main class="card">
+  <div class="progress" aria-hidden="true"><i></i><i></i><i></i></div>
+
+  <!-- Question 1 -->
+  <section class="step" id="s1">
+    <h1>تو مامی امیری؟</h1>
+    <p class="hint">فقط یه جواب درست وجود داره</p>
+    <div class="row">
+      <button class="yes" type="button">آره</button>
+      <span class="slot"><button class="no" type="button">نه</button></span>
+    </div>
+  </section>
+
+  <!-- Question 2 -->
+  <section class="step" id="s2">
+    <h1>فرد مورد علاقه امیر؟</h1>
+    <p class="hint">اسمشو بنویس</p>
+    <div class="stack">
+      <input class="field" id="name" type="text" placeholder="اینجا بنویس" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="فرد مورد علاقه امیر">
+      <div class="error" id="err" role="alert"></div>
+      <div class="row"><button class="send" type="button" id="send">ثبت جواب</button></div>
+    </div>
+  </section>
+
+  <!-- Question 3 -->
+  <section class="step" id="s3">
+    <h1>امیرو دوست داری؟</h1>
+    <p class="hint">این یکی رو خوب فکر کن</p>
+    <div class="row">
+      <button class="yes" type="button">آره</button>
+      <span class="slot"><button class="no" type="button">نه</button></span>
+    </div>
+  </section>
+
+  <!-- Finale -->
+  <section class="step finale" id="s4">
+    <svg class="heart" viewBox="0 0 24 24" aria-hidden="true">
+      <path fill="#5b9cff" d="M12 21s-7.5-4.6-9.6-9.3C1 8.4 2.9 5 6.2 5c2 0 3.5 1.1 4.3 2.4h3C14.3 6.1 15.8 5 17.8 5c3.3 0 5.2 3.4 3.8 6.7C19.5 16.4 12 21 12 21z"/>
+    </svg>
+    <h1>همه جواب‌ها درست بود</h1>
+    <p class="hint">امیر هم تو رو دوست داره</p>
+  </section>
+</main>
+
+<script>
+  const steps = [...document.querySelectorAll('.step')];
+  const dots = [...document.querySelectorAll('.progress i')];
+  const runaways = [];
+  let current = 0;
+
+  function show(i) {
+    current = i;
+    steps.forEach((s, k) => s.classList.toggle('show', k === i));
+    dots.forEach((d, k) => {
+      d.classList.toggle('on', k <= i);
+      d.classList.toggle('now', k === i);
+    });
+    if (i === 3) document.querySelector('.progress').style.visibility = 'hidden';
+    const field = steps[i].querySelector('.field');
+    if (field) setTimeout(() => field.focus(), 80);
+  }
+
+  const rand = (a, b) => a + Math.random() * Math.max(0, b - a);
+
+  /* A "No" button that can never be pressed */
+  function makeRunaway(btn, yesBtn) {
+    const slot = btn.parentElement;
+    let loose = false;
+
+    function release() {
+      if (loose) return;
+      const r = btn.getBoundingClientRect();
+      slot.style.width = r.width + 'px';
+      slot.style.height = r.height + 'px';
+      btn.classList.add('loose');
+      btn.style.left = r.left + 'px';
+      btn.style.top = r.top + 'px';
+      document.body.appendChild(btn);
+      void btn.offsetWidth;
+      loose = true;
+    }
+
+    function dodge(px, py) {
+      release();
+      const w = btn.offsetWidth, h = btn.offsetHeight;
+      const m = 14;
+      const vw = window.innerWidth, vh = window.innerHeight;
+      const yes = yesBtn.getBoundingClientRect();
+      let x = 0, y = 0;
+      for (let t = 0; t < 40; t++) {
+        x = rand(m, vw - w - m);
+        y = rand(m, vh - h - m);
+        const far = Math.hypot(x + w / 2 - px, y + h / 2 - py) > Math.min(220, vw * 0.5);
+        const overlapsYes = x < yes.right + 12 && x + w > yes.left - 12 && y < yes.bottom + 12 && y + h > yes.top - 12;
+        if (far && !overlapsYes) break;
+      }
+      btn.style.left = x + 'px';
+      btn.style.top = y + 'px';
+    }
+
+    const centerOf = () => {
+      const r = btn.getBoundingClientRect();
+      return [r.left + r.width / 2, r.top + r.height / 2];
+    };
+
+    const onTouch = e => { e.preventDefault(); const t = e.touches[0]; dodge(t.clientX, t.clientY); };
+    const onPointer = e => dodge(e.clientX, e.clientY);
+
+    btn.addEventListener('pointerenter', onPointer);
+    btn.addEventListener('pointerdown', e => { e.preventDefault(); onPointer(e); });
+    btn.addEventListener('touchstart', onTouch, { passive: false });
+    btn.addEventListener('click', e => { e.preventDefault(); e.stopPropagation(); const [cx, cy] = centerOf(); dodge(cx, cy); });
+    btn.addEventListener('focus', () => { const [cx, cy] = centerOf(); btn.blur(); dodge(cx, cy); });
+
+    const near = e => {
+      if (!document.body.contains(btn)) return;
+      const [cx, cy] = centerOf();
+      if (Math.hypot(e.clientX - cx, e.clientY - cy) < 90) dodge(e.clientX, e.clientY);
+    };
+    document.addEventListener('pointermove', near);
+
+    window.addEventListener('resize', () => {
+      if (!loose) return;
+      const r = btn.getBoundingClientRect();
+      btn.style.left = Math.min(r.left, window.innerWidth - r.width - 14) + 'px';
+      btn.style.top = Math.min(r.top, window.innerHeight - r.height - 14) + 'px';
+    });
+
+    return { destroy() { document.removeEventListener('pointermove', near); btn.remove(); } };
+  }
+
+  [['s1'], ['s3']].forEach(([id]) => {
+    const sec = document.getElementById(id);
+    const yes = sec.querySelector('.yes');
+    const no = sec.querySelector('.no');
+    const ra = makeRunaway(no, yes);
+    runaways.push(ra);
+    yes.addEventListener('click', () => {
+      ra.destroy();
+      show(id === 's1' ? 1 : 3);
+    });
+  });
+
+  /* Question 2: free text */
+  const field = document.getElementById('name');
+  const err = document.getElementById('err');
+  const send = document.getElementById('send');
+
+  const normalize = s => s
+    .toLowerCase()
+    .replace(/[\u200c\u200d\s]/g, '')
+    .replace(/ي/g, 'ی')
+    .replace(/ك/g, 'ک');
+
+  const correct = ['نگین', 'negin'];
+
+  function check() {
+    if (correct.includes(normalize(field.value))) {
+      err.textContent = '';
+      show(2);
+      return;
+    }
+    err.textContent = 'تو سوختی 🔥 دوباره امتحان کن';
+    field.classList.remove('shake');
+    void field.offsetWidth;
+    field.classList.add('shake');
+    field.select();
+  }
+
+  send.addEventListener('click', check);
+  field.addEventListener('keydown', e => { if (e.key === 'Enter') check(); });
+  field.addEventListener('input', () => { err.textContent = ''; });
+
+  show(0);
+</script>
+</body>
+  </html>
